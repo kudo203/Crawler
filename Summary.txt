@@ -1,0 +1,29 @@
+List of seed URLS -
+https://en.wikipedia.org/wiki/History_of_immigration_to_the_United_States;
+https://en.wikipedia.org/wiki/Immigration_to_the_United_States");
+https://en.wikipedia.org/wiki/Immigration_policy_of_Donald_Trump");
+https://www.theguardian.com/us-news/2017/jan/27/donald-trump-executive-order-immigration-full-text");
+https://www.usatoday.com/story/news/world/2017/01/28/what-you-need-know-trumps-refugee-ban/97183112/");
+https://www.whitehouse.gov/the-press-office/2017/01/27/executive-order-protecting-nation-foreign-terrorist-entry-united-states");
+http://www.aljazeera.com/news/2017/05/immigrant-arrests-soar-donald-trump-170518034252370.html");
+
+
+Count of indexed documents - 20000
+
+Count of unique urls from size - 17643
+
+Time taken to crawl - 5 hours and 49 min
+
+Total Space of Crawled documents - 2.39 GB
+
+Time Taken to Merge - 1 hour 30 min
+
+Count of unique urls in Merged Index - 
+
+Merged ES index size - 
+
+Explanations - 
+1. I have cherry picked some relevant words to the topic assigned to me and their stemmed versions are stored in a file named 'relevantWords.txt'. These words are given weights where word like stem(immigration) are given a weight of 4. Some words like Donald Trump, US etc are given weight 1. This system is established in such a way that there are some words which need to co-occur with other relevant words in order to make the document relevant. Hence, from each link, a list of words is generated from the link and the associated anchor text. This list of words are compared with the relevant list of words and a score is generated accordingly. If the link has a greater score than a threshold, it is added to the frontier with it's score.
+
+2. The links in the frontier queue are sorted according to the scores assigned previously
+
