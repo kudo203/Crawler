@@ -33,7 +33,7 @@ public class backendQManager {
         queuePriority = new PriorityQueue<backQueue>(3,idComparator);
     }
 
-
+    //add queues into priority queue
     public void addAllQueues(){
         if(queue1!=null)
             if(!queue1.isEmpty())
@@ -49,14 +49,37 @@ public class backendQManager {
                 queuePriority.add(queue3);
     }
 
+    //check enqueue possibility, basically stop if all queues are taken up by some domain
     public boolean canWeEnqueue(URL url) throws IOException{
+        String hostID = url.getAuthority();
         if(currQueue!=null && currQueue==queue3){
-            if(!url.getAuthority().equals(queue3.getHostID()))
+            if(!hostID.equals(queue3.getHostID())){
+                if(queue1!=null){
+                    if(hostID.equals(queue1.getHostID())){
+                        return true;
+                    }
+                    else{
+                        if(queue2!=null){
+                            if(hostID.equals(queue2.getHostID())){
+                                return true;
+                            }
+                            else{
+                                if(queue3!=null){
+                                    if(hostID.equals(queue3.getHostID())){
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 return false;
+            }
         }
         return true;
     }
 
+    //assign a new domain to a queue
     public void assignNextCurrQueue(String item,BaseRobotRules rules) throws IOException{
         URL url = new URL(item);
         String hostID = url.getAuthority();
@@ -99,19 +122,19 @@ public class backendQManager {
                 queue1.enqueue(item);
                 return 1;
             }
-        }
-        else{
-            if(queue2!=null){
-                if(hostID.equals(queue2.getHostID())){
-                    queue2.enqueue(item);
-                    return 1;
-                }
-            }
             else{
-                if(queue3!=null){
-                    if(hostID.equals(queue3.getHostID())){
-                        queue3.enqueue(item);
+                if(queue2!=null){
+                    if(hostID.equals(queue2.getHostID())){
+                        queue2.enqueue(item);
                         return 1;
+                    }
+                    else{
+                        if(queue3!=null){
+                            if(hostID.equals(queue3.getHostID())){
+                                queue3.enqueue(item);
+                                return 1;
+                            }
+                        }
                     }
                 }
             }

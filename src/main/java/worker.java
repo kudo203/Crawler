@@ -240,6 +240,7 @@ public class worker {
         return frame;
     }
 
+    //UPGRADE This
     public static void backQueuePopulate() throws IOException{
         while(true){
             //break if front end is empty
