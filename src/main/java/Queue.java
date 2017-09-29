@@ -3,13 +3,13 @@ import java.util.NoSuchElementException;
 /**
  * Created by koosh on 25/6/17.
  */
-public class Queue1 {
+public class Queue {
 
     private Node first;
     private Node last;
     private int n;
 
-    public Queue1(){
+    public Queue(){
         first = null;
         last = null;
         n = 0;
@@ -42,6 +42,4 @@ public class Queue1 {
         if (isEmpty()) last = null;   // to avoid loitering
         return item;
     }
-
-
 }

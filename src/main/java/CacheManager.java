@@ -2,6 +2,7 @@
  * Created by koosh on 20/6/17.
  */
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ public class CacheManager{
                     new Runnable() {
                         int sleepTime = 5000;
                         public void run() {
+                            HashSet removeKeyMap = new HashSet();
                             try{
                                 while(true){
                                     Set keySet = cacheMap.keySet();
@@ -26,9 +28,12 @@ public class CacheManager{
                                             Object key = keys.next();
                                             Cacheable value = (Cacheable) cacheMap.get(key);
                                             if(value.isExpired()){
-                                                cacheMap.remove(key);
+                                                removeKeyMap.add(key);
                                             }
                                         }
+                                    }
+                                    for(Object iter:removeKeyMap){
+                                        cacheMap.remove(iter);
                                     }
                                     Thread.sleep(sleepTime);
                                 }

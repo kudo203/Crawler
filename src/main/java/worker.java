@@ -40,17 +40,21 @@ import java.util.regex.Pattern;
  */
 public class worker {
 
-    private static CacheManager cacheRobots;
+    //static global variables
     private static String USER_AGENT;
     private static int defRobotLife;
-    private static Pattern pattern;
+    private static Queue frontEnd;
+    private static backendQManager backQueues;
+
+    private static CacheManager cacheRobots;
+
     private static Matcher matcher;
     private static HashMap<String,Integer> relevanceScore;
     private static Stemmer stem;
-    private static Queue1 frontEnd;
-    private static backendQManager backQueues;
     private static HashSet<String> visitedLinks;
     private static String LinkSelector;
+
+    //linkset of the current wave
     private static Map<String,Integer> waveLinks;
     private static int depth;
     private static FileWriter fw;
@@ -58,31 +62,53 @@ public class worker {
     private static ObjectMapper mapper;
     private static int crawlCount;
 
-    public static void main(String[] args) throws IOException {
+    private static Pattern pattern;
 
+    public static void main(String[] args) throws IOException {
+        //initialization
+
+
+        //load properties
         Properties properties = new Properties();
         FileReader propReader = new FileReader("conf.properties");
         //noinspection Since15
         properties.load(propReader);
         propReader.close();
 
+        //extract properties
         USER_AGENT = properties.getProperty("userAgent");
         defRobotLife = Integer.parseInt(properties.getProperty("defRobotLife"));
-        cacheRobots = new CacheManager();
-        pattern = Pattern.compile("(https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))|([-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))|(\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$)");
-        relevanceScore = loadWordScores();
-        stem = new Stemmer();
-        frontEnd = new Queue1();
+
+        //Mercantile implementation
+        frontEnd = new Queue();
         backQueues = new backendQManager();
+
+        //Cache for caching of domain rules
+        cacheRobots = new CacheManager();
+
+        pattern = Pattern.compile("(https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))|([-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))|(\\/?([^:\\/\\s]+)((\\/\\w+)*\\/)([\\w\\-\\.]+[^#?\\s]+)(.*)?(#[\\w\\-]+)?$)");
+
+        //Priority to words in the link and anchor text
+        relevanceScore = loadWordScores();
+
+        stem = new Stemmer();
         visitedLinks = new HashSet<String>();
+
+        //linkRegex
         LinkSelector = "a[href]:not([href~=(?i).*(\\.(css|js|bmp|gif|jpe?g|png|tiff?|mid|mp2|mp3|mp4|wav|avi|mov|mpeg|ram|m4v|pdf" +
                 "|rm|smil|wmv|swf|wma|zip|rar|gz|csv|xls|ppt|doc|docx|exe|dmg|midi|mid|qt|txt|ram|json))$)" +
                 ":not([href~=(?i)^#])";
+
+        //bfs depth
         depth = 0;
-        fw = new FileWriter("C:\\Users\\Koosh_20\\Desktop\\documents1.txt");
+
+        fw = new FileWriter("E:\\documents1.txt");
         bw = new BufferedWriter(fw);
+
+        //json mapper
         mapper = new ObjectMapper();
 
+        //seed URLs
         frontEnd.enqueue("https://en.wikipedia.org/wiki/History_of_immigration_to_the_United_States");
         frontEnd.enqueue("https://en.wikipedia.org/wiki/Immigration_to_the_United_States");
         frontEnd.enqueue("https://en.wikipedia.org/wiki/Immigration_policy_of_Donald_Trump");
@@ -91,7 +117,11 @@ public class worker {
         frontEnd.enqueue("https://www.whitehouse.gov/the-press-office/2017/01/27/executive-order-protecting-nation-foreign-terrorist-entry-united-states");
         frontEnd.enqueue("http://www.aljazeera.com/news/2017/05/immigrant-arrests-soar-donald-trump-170518034252370.html");
 
+
+        //end Initialization
         //frontEnd.enqueue("https://login.ncsl.org/SSO/Login.aspx?vi=7&vt=0c264c32daa67238b05dbd3d26ae1063f80b2dcee313d4d893d535eec16142c3bbefecc57cbae7c23332b1f806b9a296c72dfea0999846b677dcb9728e06b1d97bfbfe74998e9e059f5c4ef459ec738c&DPLF=Y");
+
+        //loop for crawling documents
         while(true){
             try{
                 TimeUnit.MILLISECONDS.sleep(500);
@@ -99,14 +129,18 @@ public class worker {
             catch (Exception ex){
                 System.out.println("did not sleep");
             }
-            if(crawlCount>=20000)
-                break;
+
             waveLinks = new HashMap<String,Integer>();
+
             while(!frontEnd.isEmpty())
                 frontBackTransfer();
+
             if(waveLinks.size()==0)
                 break;
+
+            //transfer wave links to frontier
             waveToFrontier();
+
             depth++;
             System.out.println(depth+"                                       ");
         }
@@ -122,10 +156,15 @@ public class worker {
     }
 
     public static void frontBackTransfer() throws IOException{
+
+        //end at a certain count
         if(crawlCount>=20000){
             System.exit(0);
         }
+
+        // initialize the domain-specific backQueues
         backQueues = new backendQManager();
+
         backQueuePopulate();
         backQueues.addAllQueues();
         while(!backQueues.ifPriorityEmpty()){
@@ -412,7 +451,7 @@ public class worker {
     }
 
     public static HashMap<String,Integer> loadWordScores() throws IOException{
-        FileReader fr = new FileReader("C:\\Users\\Koosh_20\\Desktop\\HW3\\crawler\\relevantWords.txt");
+        FileReader fr = new FileReader("C:\\Users\\Koosh_20\\Desktop\\crawlerGit1\\relevantWords.txt");
         BufferedReader br = new BufferedReader(fr);
 
         HashMap<String,Integer> ans = new HashMap<String, Integer>();

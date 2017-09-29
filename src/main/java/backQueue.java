@@ -7,13 +7,13 @@ import java.util.Date;
  * Created by koosh on 25/6/17.
  */
 public class backQueue {
-    private Queue1 q;
+    private Queue q;
     private String hostID;
     private Date politeWait;
     private BaseRobotRules rules;
 
     public backQueue(String domain,BaseRobotRules rules){
-        this.q = new Queue1();
+        this.q = new Queue();
         this.hostID = domain;
         this.politeWait = new Date();
         this.rules = rules;

@@ -21,14 +21,18 @@ public class backendQManager {
     private BaseRobotRules currRules;
 
     public backendQManager(){
+        //comparator unit for priority
         idComparator = new Comparator<backQueue>(){
             @Override
             public int compare(backQueue c1, backQueue c2) {
                 return (int) (c1.getPoliteWait().getTime() - c2.getPoliteWait().getTime());
             }
         };
+
+        // priority queue according to politeness wait time
         queuePriority = new PriorityQueue<backQueue>(3,idComparator);
     }
+
 
     public void addAllQueues(){
         if(queue1!=null)
